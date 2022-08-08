@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel")
+const cartModel=require("../controllers/cartController")
 const { uploadFile } = require("../controllers/awsController")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
@@ -14,6 +15,7 @@ const { validateString,
     imageExtValidator, 
     onlyWholeNumbers,
 startWithZero} = require("../validator/validations")
+const cartModel = require("../models/cartModel")
 
 
 //=====================================CREATING USER PROFILE===========================================================//
@@ -21,14 +23,14 @@ startWithZero} = require("../validator/validations")
 
 let createUser = async function (req, res) {
     try {
-        let data = req.body
-        if(typeof data.address=="string"){
+        let bodyData = req.body
+        if(typeof bodyData.address=="string"){
         try {
-            data.address = JSON.parse(data.address)
+            bodyData.address = JSON.parse(bodyData.address)
         } catch (err) { return res.status(400).send({ status: false, message: "please type address correctly or provide pincode not starting with 0" }) }
     }
-        let { address, fname, lname, email, password, phone } = data
-        if (validateRequest(data)) { return res.status(400).send({ status: false, message: "please provide the data in the body" }) }
+        let { address, fname, lname, email, password, phone } = bodyData
+        if (validateRequest(bodyData)) { return res.status(400).send({ status: false, message: "please provide the data in the body" }) }
 
         if (!validateString(fname)) { return res.status(400).send({ status: false, message: "please provide the first name" }) }
         if (!regxName(fname)) { return res.status(400).send({ status: false, message: "please provide a valid first name" }) }
@@ -72,25 +74,27 @@ let createUser = async function (req, res) {
 
         const salt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password, salt);
-        data.password = encryptedPassword
+        bodyData.password = encryptedPassword
 
         let profile = req.files;
         if (profile && profile.length > 0) {
             if (!imageExtValidator(profile[0].originalname)) { return res.status(400).send({ status: false, message: "only image file is allowed" }) }
             let uploadedFileURL = await uploadFile(profile[0]);
-            data.profileImage = uploadedFileURL
+            bodyData.profileImage = uploadedFileURL
         } else {
             return res.status(400).send({ status: false, message: "please provide profile image " });
         }
 
-        let isDuplicateEmail = await userModel.findOne({ email: data.email })
+        let isDuplicateEmail = await userModel.findOne({ email: bodyData.email })
         if (isDuplicateEmail) { return res.status(400).send({ status: false, message: "this email already exists" }) }
 
-        let isDuplicatePhone = await userModel.findOne({ phone: data.phone })
+        let isDuplicatePhone = await userModel.findOne({ phone: bodyData.phone })
         if (isDuplicatePhone) { return res.status(400).send({ status: false, message: "this phone number already exists" }) }
 
-        let createdData = await userModel.create(data)
-        res.status(201).send({ status: true, message: "user registered successfully", data: createdData })
+        let newUser = await userModel.create(bodyData)
+        newUser=newUser.toObject()
+        delete(newUser.password)
+        res.status(201).send({ status: true, message: "user registered successfully", data: newUser })
     }
     catch (err) {
         console.log(err)
@@ -148,8 +152,11 @@ let getUser = async function (req, res) {
         let tokenUserId=req.user.userId
         if(tokenUserId!==userId){return res.status(403).send({status:false,message:"authorization failed"})}
 
-        let getUserDoc = await userModel.findById(userId)
+        let getUserDoc = await userModel.findById(userId,{password:0}).lean()
         if (!getUserDoc) { return res.status(404).send({ status: false, message: "No such user is available" }) }
+        
+        let userCart=await cartModel.findOne({userId:userId})
+        if(userCart){ getUserDoc.cartId=userCart._Id}
 
         res.status(200).send({ status: true, message: "User profile details", data: getUserDoc })
 
