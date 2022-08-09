@@ -3,7 +3,7 @@ let ObjectId = mongoose.Schema.Types.ObjectId
 let orderSchema = new mongoose.Schema(
   {
 
-    userId: { type: ObjectId, refs: 'User', required: true },
+    userId: { type: ObjectId, ref: 'User', required: true },
     items: [{
       productId: { type: ObjectId, ref: 'Product', required: true },
       quantity: { type: Number, required: true },

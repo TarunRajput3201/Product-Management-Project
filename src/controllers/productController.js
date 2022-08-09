@@ -18,7 +18,7 @@ let createProduct = async function (req, res) {
 
 
         if (validateRequest(bodyData)) { return res.status(400).send({ status: false, message: "please provide data in body" }) }
-        let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments, prductImage } = bodyData
+        let { title, description, price, isFreeShipping, style, availableSizes, installments, prductImage } = bodyData
 
         if (!title) { return res.status(400).send({ status: false, message: "please provide title" }) }
 
@@ -273,7 +273,7 @@ const updateProduct = async function (req, res) {
             let uploadedFileURL = await uploadFile(imageUrl[0]);
             productDoc.productImage = uploadedFileURL
         }
-        else if ("productImage" in data) { return res.status(400).send({ status: false, msg: "Please select product Image" }) }
+        else if (!"productImage" in data) { return res.status(400).send({ status: false, msg: "Please select product Image" }) }
          
         
 

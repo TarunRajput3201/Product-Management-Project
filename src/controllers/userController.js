@@ -1,5 +1,5 @@
 const userModel = require("../models/userModel")
-const cartModel=require("../controllers/cartController")
+
 const { uploadFile } = require("../controllers/awsController")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
@@ -55,8 +55,9 @@ let createUser = async function (req, res) {
 
         if (!validateString(address.shipping.city)) { return res.status(400).send({ status: false, message: "please provide the city in shipping address" }) }
 
-        if (startWithZero(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "Shipping address:pincode cannot start with zero" }) }
+        
         if (!address.shipping.pincode) { return res.status(400).send({ status: false, message: "please provide the pincode in shipping address" }) }
+        if (startWithZero(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "Shipping address:pincode cannot start with zero" }) }
         // if (!validateNumber(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "please provide a valid shipping pincode" }) }
         
         if (!isValidPincode(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "Shipping address:pincode must be 6 digits" }) }
@@ -67,8 +68,9 @@ let createUser = async function (req, res) {
 
         if (!validateString(address.billing.city)) { return res.status(400).send({ status: false, message: "please provide the city in billing address" }) }
 
-        if (startWithZero(address.billing.pincode)) { return res.status(400).send({ status: false, message: "Billing address:pincode cannot be zero or start with zero" }) }
+        
         if (!address.billing.pincode) { return res.status(400).send({ status: false, message: "please provide the pincode in billing address" }) }
+        if (startWithZero(address.billing.pincode)) { return res.status(400).send({ status: false, message: "Billing address:pincode cannot be zero or start with zero" }) }
         // if (!validateNumber(address.billing.pincode)) { return res.status(400).send({ status: false, message: "please provide a valid billing pincode" }) }
         if (!isValidPincode(address.billing.pincode)) { return res.status(400).send({ status: false, message: "Billing address:pincode must be 6 digits" }) }
 
@@ -85,10 +87,10 @@ let createUser = async function (req, res) {
             return res.status(400).send({ status: false, message: "please provide profile image " });
         }
 
-        let isDuplicateEmail = await userModel.findOne({ email: bodyData.email })
+        let isDuplicateEmail = await userModel.findOne({ email:email })
         if (isDuplicateEmail) { return res.status(400).send({ status: false, message: "this email already exists" }) }
 
-        let isDuplicatePhone = await userModel.findOne({ phone: bodyData.phone })
+        let isDuplicatePhone = await userModel.findOne({ phone:phone })
         if (isDuplicatePhone) { return res.status(400).send({ status: false, message: "this phone number already exists" }) }
 
         let newUser = await userModel.create(bodyData)
@@ -225,7 +227,7 @@ const Updateprofile = async function (req, res) {
         if (bodyData.hasOwnProperty("password")) {
             if (!validateString(password)){return res.status(400).send({ status: false, message: "please provide password" })}
             if (password.length < 8 || password.length > 15) { return res.status(400).send({ status: false, message: "password must be between 8-15" }) }
-            const salt = await bcrypt.genSalt(13);
+            const salt = await bcrypt.genSalt(10);
             const encryptedPassword = await bcrypt.hash(password, salt);
             userData.password = encryptedPassword
         }

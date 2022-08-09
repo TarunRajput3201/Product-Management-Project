@@ -1,5 +1,5 @@
 {
-  "name": "product_management",
+  "name": "Product-Management-Project",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TarunRajput3201/Product_Management.git"
+    "url": "git+https://github.com/TarunRajput3201/Product-Management-Project.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/TarunRajput3201/Product_Management/issues"
+    "url": "https://github.com/TarunRajput3201/Product-Management-Project/issues"
   },
-  "homepage": "https://github.com/TarunRajput3201/Product_Management#readme",
+  "homepage": "https://github.com/TarunRajput3201/Product-Management-Project#readme",
   "dependencies": {
     "aws-sdk": "^2.1181.0",
     "bcrypt": "^5.0.1",

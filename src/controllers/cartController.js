@@ -2,7 +2,8 @@ const cartModel = require("../models/cartModel")
 const productModel = require("../models/productModel")
 const userModel = require("../models/userModel")
 const { validateRequest,
-    validateObjectId,} = require("../validator/validations")
+    validateObjectId,
+    validateString,} = require("../validator/validations")
 
 //=====================================CREATING CART===========================================================//
 
@@ -132,11 +133,13 @@ let updateCart = async function (req, res) {
             return res.status(400).send({ status: false, message: "no items in this cart to be updated" })
         }
         let product = await productModel.findById(productId)
+          
+        console.log(removeProduct)
+        if (!("removeProduct" in bodyData)) {return res.status(400).send({ status: false, message: "please provide removeProduct" }) }
+        if (!validateString(removeProduct)) {return res.status(400).send({ status: false, message: "please provide removeProduct" }) }
 
-        if (removeProduct) {
-
-            if (removeProduct == 0) {
-                for (let i = 0; i < cart.items.length; i++) {
+            if (removeProduct==0 || removeProduct=="0") {
+                for (let i=0;i<cart.items.length; i++) {
                     if (cart.items[i].productId == productId) {
                        
                        cart.totalPrice=cart.totalPrice-(product.price*cart.items[i].quantity)
@@ -144,7 +147,7 @@ let updateCart = async function (req, res) {
                     }
                 }
             }
-            else if (removeProduct == 1) {
+            else if (removeProduct == 1|| removeProduct=="1") {
                 for (let i = 0; i < cart.items.length; i++) {
                     if (cart.items[i].productId == productId) {
                         if (cart.items[i].quantity == 1) {
@@ -158,9 +161,9 @@ let updateCart = async function (req, res) {
                     }
                 }
             }
-            else { return res.status(400).send({ status: false, message: "please provide only 0 or 1" }) }
-        }
-        else{return res.status(400).send({ status: false, message: "please provide removeProduct" }) }
+            else { return res.status(400).send({ status: false, message: "please provide only 0 or 1 in remove product" }) }
+        
+        
 
         cart.totalItems=cart.items.length
 
