@@ -38,11 +38,10 @@ const createOrder = async function (req, res) {
             if (!validateString(cancellable)) { return res.status(400).send({ status: false, message: "cancellable can't be empty" }) }
             if (!(cancellable == "false" || cancellable == "true")) { return res.status(400).send({ status: false, message: "please provide cancellable value in true or false" }) }
             if (cancellable == "false" || cancellable == false) { cart.cancellable = false }
-            if (cancellable == "true" || cancellable == false) { cart.cancellable = true }
+            if (cancellable == "true" || cancellable == true) { cart.cancellable = true }
         }
         
         let orderCreated = await orderModel.create(cart)
-
         cart.items = []
         cart.totalPrice = 0
         cart.totalItems = 0

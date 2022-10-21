@@ -5,7 +5,7 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const { validateString,
-    validateNumber,
+    
     validateRequest,
     validateEmail,
     regexPhoneNumber,
@@ -13,7 +13,7 @@ const { validateString,
     isValidPincode,
     validatePassword,
     imageExtValidator, 
-    onlyWholeNumbers,
+    
 startWithZero} = require("../validator/validations")
 const cartModel = require("../models/cartModel")
 
